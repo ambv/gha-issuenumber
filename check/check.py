@@ -20,9 +20,10 @@ def read_event_json():
 def ensure_issue_numbers_in_event(event: Dict[str, Any]) -> int:
     last_issue_number = 0
     if "pull_request" in event:
-        commit_count = event["pull_request"]["commits"]
         for commit_id, issue_numbers in gen_issue_numbers_from_git(
-            commit_count=commit_count
+            commit_count=event["pull_request"]["commits"],
+            base_sha=event["pull_request"]["base"]["sha"],
+            head_sha=event["pull_request"]["head"]["sha"],
         ):
             if not issue_numbers:
                 raise LookupError(commit_id)
@@ -38,22 +39,30 @@ def ensure_issue_numbers_in_event(event: Dict[str, Any]) -> int:
 
 
 def gen_issue_numbers_from_git(
-    *, commit_count: int
+    *, commit_count: int, base_sha: str, head_sha: str,
 ) -> Iterator[Tuple[str, List[int]]]:
     from dulwich import repo
 
     r = repo.Repo(".")
-    walker = r.get_walker(max_entries=commit_count, reverse=True)
+    walker = r.get_walker(max_entries=commit_count + 2, reverse=True)
     for entry in walker:
         sha = entry.commit.id.decode("utf8")
         message = entry.commit.message.decode("utf8")
         issue_numbers = [int(num) for num in ISSUE_NUMBER_RE.findall(message)]
+
+        if base_sha:
+            if base_sha == sha:
+                base_sha = ""
+            continue
+
         print(
             f"Checked {sha}: {len(issue_numbers)} issue numbers",
             file=sys.stderr,
         )
         print(message, end="\n\n")
         yield (sha, issue_numbers)
+        if sha == head_sha:
+            break
 
 
 def is_pull_request_with_skip_issue_label(event: Dict[str, Any]) -> bool:
