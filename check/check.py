@@ -47,9 +47,8 @@ def gen_issue_numbers_from_git(
     for entry in walker:
         sha = entry.commit.id.decode("utf8")
         message = entry.commit.message.decode("utf8")
-        if issue_numbers := ISSUE_NUMBER_RE.findall(message):
-            issue_numbers_int = [int(num) for num in issue_numbers]
-            yield (sha, issue_numbers_int)
+        issue_numbers = [int(num) for num in ISSUE_NUMBER_RE.findall(message)]
+        yield (sha, issue_numbers)
 
 
 def is_pull_request_with_skip_issue_label(event: Dict[str, Any]) -> bool:
