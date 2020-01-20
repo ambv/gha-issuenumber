@@ -41,7 +41,7 @@ def get_previous_run(
 
 def rerequest(org: str, repo: str, suite_id: str, github_token: str) -> None:
     url = f"{API}/repos/{org}/{repo}/check-suites/{suite_id}/rerequest"
-    print("Re-requesting {url}...", file=sys.stderr)
+    print(f"Re-requesting {url}...", file=sys.stderr)
     response = httpx.post(
         url,
         headers=[
