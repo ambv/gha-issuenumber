@@ -1,0 +1,12 @@
+name: 'Re-Run'
+description: 'Re-run checks on certain conditions met.'
+inputs:
+inputs:
+  github_token:
+    description: Github API token.
+    required: true
+  check_to_rerun:
+      required: true
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
