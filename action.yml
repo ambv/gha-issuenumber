@@ -1,0 +1,8 @@
+name: 'Ensure Issue Number'
+description: 'Check that all new commits have an issue number attached'
+outputs:
+  issuenumber:
+    description: 'The first issue number found'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
