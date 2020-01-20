@@ -48,6 +48,11 @@ def gen_issue_numbers_from_git(
         sha = entry.commit.id.decode("utf8")
         message = entry.commit.message.decode("utf8")
         issue_numbers = [int(num) for num in ISSUE_NUMBER_RE.findall(message)]
+        print(
+            f"Checked {sha}: {len(issue_numbers)} issue numbers",
+            file=sys.stderr,
+        )
+        print(message, end="\n\n")
         yield (sha, issue_numbers)
 
 
